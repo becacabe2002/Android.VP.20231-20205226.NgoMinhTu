@@ -18,7 +18,7 @@ class UserCardAdapter(private val userList: List<User>) : RecyclerView.Adapter<U
         private val textView_email: TextView = itemView.findViewById(R.id.tv_email)
         private val textView_sex: TextView = itemView.findViewById(R.id.tv_sex)
         private val textView_dob: TextView = itemView.findViewById(R.id.tv_dob)
-
+        
         fun bind(user: User){
             val combinedName = user.firstName + " " + user.lastName
             textView_name.text = combinedName

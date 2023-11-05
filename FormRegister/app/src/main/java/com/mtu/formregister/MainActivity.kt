@@ -3,11 +3,16 @@ package com.mtu.formregister
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
 import android.widget.Button
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
+import androidx.recyclerview.widget.RecyclerView.Recycler
 import com.mtu.formregister.adapter.UserCardAdapter
 import com.mtu.formregister.model.User
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -20,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: UserCardAdapter
     private var simpleDateFormat = SimpleDateFormat("dd/MM/yyyy")
     private var userList = mutableListOf<User>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -44,6 +48,32 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, RegisterUser::class.java)
             startActivityForResult(intent, REQUEST_CODE)
         }
+
+        // add predefined animation for recycleView
+        recyclerView.itemAnimator = SlideInUpAnimator()
+
+//        recyclerView.addOnItemTouchListener(object : OnItemTouchListener {
+//            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+//                return true
+//            }
+//
+//            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+//                val childView = rv.findChildViewUnder(e.x, e.y)
+//                if(childView != null){
+//                    val pos = rv.getChildAdapterPosition(childView)
+//                    if(pos != RecyclerView.NO_POSITION){
+//                        selectItem = userList[pos]
+//                        Toast.makeText(rv.context, "${selectItem.firstName.toString()} is selected", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//
+//            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+//                TODO("Not yet implemented")
+//            }
+//        })
+
+
     }
 
     @Deprecated("Deprecated in Java")
