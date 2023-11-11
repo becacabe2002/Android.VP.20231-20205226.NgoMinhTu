@@ -10,10 +10,10 @@ import com.mtu.formregister.R
 import com.mtu.formregister.model.User
 import java.text.SimpleDateFormat
 
-class UserCardAdapter(private val userList: List<User>) : RecyclerView.Adapter<UserCardAdapter.UserCardViewHolder>() {
+class UserCardAdapter(private val userList: List<User>, val listener: ItemClickListener? = null) : RecyclerView.Adapter<UserCardAdapter.UserCardViewHolder>() {
     val dateFormat = SimpleDateFormat("dd/MM/yyyy")
 
-    inner class UserCardViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    inner class UserCardViewHolder(itemView: View, val listener: ItemClickListener?): RecyclerView.ViewHolder(itemView){
         private val textView_name: TextView = itemView.findViewById(R.id.tv_name)
         private val textView_email: TextView = itemView.findViewById(R.id.tv_email)
         private val textView_sex: TextView = itemView.findViewById(R.id.tv_sex)
@@ -25,12 +25,16 @@ class UserCardAdapter(private val userList: List<User>) : RecyclerView.Adapter<U
             textView_email.text = user.email
             textView_sex.text = if (user.sex) "Man" else "Woman"
             textView_dob.text = dateFormat.format(user.dob)
+
+            itemView.setOnClickListener{
+                listener?.itemClicked(bindingAdapterPosition)
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserCardViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.user_card, parent, false)
-        return UserCardViewHolder(view)
+        return UserCardViewHolder(view, listener)
     }
 
     override fun getItemCount(): Int {
@@ -40,6 +44,10 @@ class UserCardAdapter(private val userList: List<User>) : RecyclerView.Adapter<U
     override fun onBindViewHolder(holder: UserCardViewHolder, position: Int) {
         val user: User = userList[position]
         holder.bind(user)
+    }
+
+    interface ItemClickListener{
+        fun itemClicked(position: Int)
     }
 
 }

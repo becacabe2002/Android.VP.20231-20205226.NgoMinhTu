@@ -1,11 +1,13 @@
 package com.mtu.formregister
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
@@ -30,71 +32,50 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // populate the list
-        userList.add(User(firstName = "Minh Tu 1", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002"), email = "ngominhtu@gmail.com", address = "abcded"))
-        userList.add(User(firstName = "Minh Tu 2", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002"), email = "ngominhtu@gmail.com", address = "abcded"))
-        userList.add(User(firstName = "Minh Tu 3", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002"), email = "ngominhtu@gmail.com", address = "abcded"))
-        userList.add(User(firstName = "Minh Tu 4", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002"), email = "ngominhtu@gmail.com", address = "abcded"))
-        userList.add(User(firstName = "Minh Tu 5", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002"), email = "ngominhtu@gmail.com", address = "abcded"))
-        userList.add(User(firstName = "Minh Tu 6", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002"), email = "ngominhtu@gmail.com", address = "abcded"))
-        userList.add(User(firstName = "Minh Tu 7", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002"), email = "ngominhtu@gmail.com", address = "abcded"))
+        userList.add(User(firstName = "Minh Tu 1", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002")!!, email = "ngominhtu@gmail.com", address = "abcded"))
+        userList.add(User(firstName = "Minh Tu 2", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002")!!, email = "ngominhtu@gmail.com", address = "abcded"))
+        userList.add(User(firstName = "Minh Tu 3", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002")!!, email = "ngominhtu@gmail.com", address = "abcded"))
+        userList.add(User(firstName = "Minh Tu 4", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002")!!, email = "ngominhtu@gmail.com", address = "abcded"))
+        userList.add(User(firstName = "Minh Tu 5", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002")!!, email = "ngominhtu@gmail.com", address = "abcded"))
+        userList.add(User(firstName = "Minh Tu 6", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002")!!, email = "ngominhtu@gmail.com", address = "abcded"))
+        userList.add(User(firstName = "Minh Tu 7", lastName = "Ngo",sex = true, dob = simpleDateFormat.parse("29/12/2002")!!, email = "ngominhtu@gmail.com", address = "abcded"))
 
         recyclerView = findViewById(R.id.rv_cards)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = UserCardAdapter(userList)
+        adapter = UserCardAdapter(userList, object: UserCardAdapter.ItemClickListener{
+            override fun itemClicked(position: Int) {
+                val selectItem: User = userList[position]
+                Toast.makeText(recyclerView.context, "${selectItem.firstName.toString()} is selected", Toast.LENGTH_SHORT).show()
+            }
+        })
         recyclerView.adapter = adapter
 
         val btnAddUser: Button = findViewById(R.id.btn_addUser)
         btnAddUser.setOnClickListener {
-            val intent = Intent(this, RegisterUser::class.java)
-            startActivityForResult(intent, REQUEST_CODE)
+            startRegisterFormForResult()
         }
 
         // add predefined animation for recycleView
         recyclerView.itemAnimator = SlideInUpAnimator()
 
-//        recyclerView.addOnItemTouchListener(object : OnItemTouchListener {
-//            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-//                return true
-//            }
-//
-//            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-//                val childView = rv.findChildViewUnder(e.x, e.y)
-//                if(childView != null){
-//                    val pos = rv.getChildAdapterPosition(childView)
-//                    if(pos != RecyclerView.NO_POSITION){
-//                        selectItem = userList[pos]
-//                        Toast.makeText(rv.context, "${selectItem.firstName.toString()} is selected", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//
-//            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-//                TODO("Not yet implemented")
-//            }
-//        })
-
-
     }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
-            val newUser = data?.let {
-                User(
-                    data.getStringExtra("newUserFirstname").toString(),
-                    data.getStringExtra("newUserLastname").toString(),
-                    it.getBooleanExtra("newUserGender", true),
-                    simpleDateFormat.parse(data.getStringExtra("newUserDob").toString())!!,
-                    data.getStringExtra("newUserAddress").toString(),
-                    data.getStringExtra("newUserEmail").toString())
-            }
-            if (newUser != null){
-                userList.add(newUser)
-                adapter.notifyItemInserted(userList.size - 1)
-            }
+    private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
+        if(result.resultCode == Activity.RESULT_OK){
+            val data: Intent? = result.data
+            val newUser = User(
+                data!!.getStringExtra("newUserFirstname").toString(),
+                data.getStringExtra("newUserLastname").toString(),
+                data.getBooleanExtra("newUserGender", true),
+                simpleDateFormat.parse(data.getStringExtra("newUserDob").toString())!!,
+                data.getStringExtra("newUserAddress").toString(),
+                data.getStringExtra("newUserEmail").toString())
+            userList.add(newUser)
+            adapter.notifyItemInserted(userList.size - 1)
         }
     }
 
-
+    private fun startRegisterFormForResult(){
+        val intent = Intent(this, RegisterUser::class.java)
+        resultLauncher.launch(intent)
+    }
 }
