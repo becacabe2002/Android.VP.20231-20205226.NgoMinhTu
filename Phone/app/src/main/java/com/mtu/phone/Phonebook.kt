@@ -10,7 +10,6 @@ class Phonebook : AppCompatActivity() {
     companion object {
         private const val REQUEST_CODE = 123
     }
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ContactCardAdapter
     private var contactList = mutableListOf<Contact>()
